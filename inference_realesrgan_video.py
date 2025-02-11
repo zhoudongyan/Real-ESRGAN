@@ -24,7 +24,7 @@ except ImportError:
 
     # Add this module to `sys.modules` so other imports can access it
     sys.modules["torchvision.transforms.functional_tensor"] = functional_tensor
-    
+
 from basicsr.archs.rrdbnet_arch import RRDBNet
 from basicsr.utils.download_util import load_file_from_url
 from os import path as osp
@@ -156,6 +156,9 @@ class Writer:
 
     def __init__(self, args, audio, height, width, video_save_path, fps):
         out_width, out_height = int(width * args.outscale), int(height * args.outscale)
+        # Ensure dimensions are even, which is a requirement for most video codecs
+        out_width = out_width + (out_width % 2)
+        out_height = out_height + (out_height % 2)
         if out_height > 2160:
             print('You are generating video that is larger than 4K, which will be very slow due to IO speed.',
                   'We highly recommend to decrease the outscale(aka, -s).')
